@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+{% block style %}
+  <style>
+    :root {
+      --bg:         #ffffff;
+      --bg2:        #f7f5f2;
+      --panel-bg:   #1c1c28;
+      --ink:        #1c1c28;
+      --ink2:       #3d3d52;
+      --muted:      #9090a8;
+      --sage:       #5b8c6e;
+      --sage2:      #7ab592;
+      --sage-light: #e8f3ed;
+      --blush:      #e8856a;
+      --sky:        #5b8cb8;
+      --border:     #e8e5e0;
+      --border2:    #d4d0ca;
+      --field-bg:   #faf9f7;
+      --red:        #d94f4f;
+      --green:      #4fad77;
+      --shadow:     rgba(28,28,40,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); overflow-x: hidden; }
+
+    /* ── LAYOUT ── */
+    .auth-shell { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+    /* ── LEFT PANEL ── */
+    .panel-left {
+      position: relative;
+      background: var(--panel-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3rem;
+      overflow: hidden;
+    }
+
+    /* Soft color blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      animation: blobMove 18s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .blob-1 { width: 360px; height: 360px; background: #5b8c6e; opacity: 0.25; top: -80px; left: -60px; animation-delay:0s; }
+    .blob-2 { width: 280px; height: 280px; background: #e8856a; opacity: 0.2;  bottom: 80px; right: -60px; animation-delay:-6s; }
+    .blob-3 { width: 200px; height: 200px; background: #5b8cb8; opacity: 0.18; top: 45%;   right: 20%;  animation-delay:-11s; }
+    @keyframes blobMove {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(20px,16px) scale(1.06); }
+    }
+
+    /* Dot pattern */
+    .panel-left::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none; z-index: 1;
+    }
+
+    .panel-logo {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; gap: 0.7rem;
+      text-decoration: none;
+    }
+    .logo-mark {
+      width: 38px; height: 38px;
+      background: var(--sage);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .logo-text { font-family: 'Fraunces', serif; font-size: 1.4rem; color: #fff; letter-spacing: 0.02em; }
+
+    .panel-body { position: relative; z-index: 2; }
+
+    .panel-tagline {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.4rem, 3.5vw, 3.6rem);
+      font-weight: 300;
+      line-height: 1.18;
+      color: #fff;
+      margin-bottom: 1.2rem;
+    }
+    .panel-tagline em { font-style: italic; color: var(--sage2); }
+
+    .panel-desc {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.75;
+      max-width: 320px;
+      margin-bottom: 2.8rem;
+    }
+
+    .panel-pills { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+    .pill {
+      padding: 0.38rem 0.9rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .pill.active { background: rgba(91,140,110,0.3); color: var(--sage2); border-color: rgba(91,140,110,0.4); }
+
+    .panel-footer {
+      position: relative; z-index: 2;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 1.5rem;
+      display: flex; gap: 2.5rem;
+    }
+    .stat-num {
+      font-family: 'Fraunces', serif;
+      font-size: 1.8rem; font-weight: 400;
+      color: #fff; line-height: 1;
+    }
+    .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 0.2rem; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    /* ── RIGHT PANEL ── */
+    .panel-right {
+      display: flex; align-items: center; justify-content: center;
+      padding: 2.5rem 3.5rem;
+      background: var(--bg);
+      position: relative;
+    }
+
+    /* Subtle top stripe */
+    .panel-right::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--sage), var(--blush), var(--sky));
+    }
+
+    .form-shell {
+      width: 100%; max-width: 400px;
+      animation: fadeRight 0.5s ease both;
+    }
+    @keyframes fadeRight {
+      from { opacity: 0; transform: translateX(18px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .form-heading { margin-bottom: 1.8rem; }
+    .form-heading h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 2rem; font-weight: 400;
+      color: var(--ink); line-height: 1.2; margin-bottom: 0.35rem;
+    }
+    .form-heading h1 em { font-style: italic; color: var(--sage); }
+    .form-heading p { font-size: 0.84rem; color: var(--muted); }
+
+    /* Google */
+    .btn-google {
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      width: 100%; padding: 0.72rem 1rem;
+      background: var(--field-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--ink2);
+      font-size: 0.87rem; font-weight: 500;
+      font-family: 'Outfit', sans-serif;
+      text-decoration: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      margin-bottom: 1.4rem;
+    }
+    .btn-google:hover {
+      border-color: var(--border2);
+      background: #fff;
+      box-shadow: 0 2px 12px var(--shadow);
+      color: var(--ink);
+    }
+    .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* Divider */
+    .or-divider {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1.4rem;
+      font-size: 0.72rem; color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Fields */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    .field-group { margin-bottom: 0.95rem; }
+
+    .field-label {
+      display: block;
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink2); margin-bottom: 0.42rem;
+    }
+
+    .field-wrap { position: relative; }
+
+    .field-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--field-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--ink);
+      font-size: 0.9rem; font-family: 'Outfit', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .field-input::placeholder { color: var(--muted); font-size: 0.84rem; }
+    .field-input:focus {
+      border-color: var(--sage);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(91,140,110,0.12);
+    }
+    .field-input.err { border-color: var(--red); }
+    .field-input.err:focus { box-shadow: 0 0 0 3px rgba(217,79,79,0.1); }
+    .field-wrap .field-input { padding-right: 2.5rem; }
+
+    .pw-toggle {
+      position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: 4px; transition: color 0.2s; display: flex;
+    }
+    .pw-toggle:hover { color: var(--sage); }
+    .pw-toggle svg { width: 15px; height: 15px; }
+
+    /* Strength */
+    .pw-bar-wrap { height: 2px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+    .pw-bar-fill { height: 100%; border-radius: 2px; transition: width .3s, background .3s; width: 0; }
+    .pw-hint { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+
+    /* Match */
+    .match-msg { font-size: 0.71rem; margin-top: 4px; display: none; }
+    .match-msg.bad  { color: var(--red);   display: block; }
+    .match-msg.good { color: var(--green); display: block; }
+
+    /* Flash */
+    .flash { padding: 0.7rem 1rem; border-radius: 8px; font-size: 0.82rem; margin-bottom: 1rem; }
+    .flash-error   { background: #fdf2f2; border: 1px solid #f5c2c2; color: var(--red); }
+    .flash-success { background: #f0faf4; border: 1px solid #b8e8cc; color: var(--green); }
+
+    /* Submit */
+    .btn-submit {
+      width: 100%; padding: 0.8rem;
+      background: var(--sage); color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 0.92rem; font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer; letter-spacing: 0.02em;
+      transition: background 0.22s, transform 0.15s, box-shadow 0.22s;
+      margin-top: 0.4rem;
+    }
+    .btn-submit:hover {
+      background: #4a7a5e;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(91,140,110,0.28);
+    }
+    .btn-submit:active { transform: translateY(0); }
+
+    .form-footer {
+      text-align: center; margin-top: 1.3rem;
+      font-size: 0.82rem; color: var(--muted);
+    }
+    .form-footer a { color: var(--sage); font-weight: 500; text-decoration: none; }
+    .form-footer a:hover { color: #4a7a5e; text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .auth-shell { grid-template-columns: 1fr; }
+      .panel-left { display: none; }
+      .panel-right { padding: 2.5rem 1.5rem; min-height: 100vh; align-items: flex-start; padding-top: 3rem; }
+    }
+    @media (max-width: 420px) {
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+
+{% endblock %}
+{% block content %}
+
+
+<div class="auth-shell">
+
+  <!-- LEFT -->
+  <div class="panel-left">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <a href="/" class="panel-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      </div>
+      <span class="logo-text">შოპი</span>
+    </a>
+
+    <div class="panel-body">
+      <p class="panel-tagline">
+        პროდუქტები,<br/><em>რომლებიც</em><br/>შენთვის მოვა
+      </p>
+      <p class="panel-desc">
+        ათასობით ბრენდი, სწრაფი მიტანა და სრულიად უსაფრთხო გადახდა — ყველაფერი ერთ ადგილას.
+      </p>
+      <div class="panel-pills">
+        <span class="pill active">✓ უფასო მიტანა</span>
+        <span class="pill active">✓ 30 დღე დაბრუნება</span>
+        <span class="pill">24/7 მხარდაჭერა</span>
+        <span class="pill">უსაფრთხო გადახდა</span>
+      </div>
+    </div>
+
+    <div class="panel-footer">
+      <div>
+        <div class="stat-num">12K+</div>
+        <div class="stat-label">პროდუქტი</div>
+      </div>
+      <div>
+        <div class="stat-num">98%</div>
+        <div class="stat-label">კმაყოფილება</div>
+      </div>
+      <div>
+        <div class="stat-num">50K+</div>
+        <div class="stat-label">მომხმარებელი</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="panel-right">
+    <div class="form-shell">
+
+      <div class="form-heading">
+        <h1>შექმენი<br/><em>ანგარიში</em></h1>
+        <p>შეავსე ველები — მხოლოდ ერთი წუთი სჭირდება</p>
+      </div>
+
+      <a href="{{url_for('google.login')}}" class="btn-google">
+        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Google-ით გაგრძელება
+      </a>
+
+      <div class="or-divider">ან ელ-ფოსტით</div>
+
+    <form action="{{url_for('register')}}" method="post">
+      {{form.hidden_tag()}}
+      {% if error %}
+          <div class="flash flash-error">{{ error }}</div>
+      {% endif %}
+        <div class="field-row">
+          <div class="field-group">
+            {{form.username.label(class="field-label")}}
+            {{form.username(class="field-input", id="username", placeholder="giorgi99", autocomplete="username")}}
+          </div>
+          <div class="field-group">
+            {{form.email.label(class="field-label")}}
+            {{form.email(class="field-input", id="email", placeholder="შენი@mail.com", autocomplete="email")}}
+          </div>
+        </div>
+
+        <div class="field-group">
+            {{form.password.label(class="field-label")}}
+          <div class="field-wrap">
+            {{form.password(class="field-input", id="password", placeholder="მინ. 8 სიმბოლო", autocomplete="new-password")}}
+            <button type="button" class="pw-toggle" onclick="togglePw('password',this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="pw-bar-wrap"><div class="pw-bar-fill" id="pwFill"></div></div>
+          <div class="pw-hint" id="pwHint"></div>
+        </div>
+
+        <div class="field-group">
+            {{form.password2.label(class="field-label")}}
+          <div class="field-wrap">
+            {{form.password2(class="field-input", id="confirm_password", placeholder="••••••••", autocomplete="new-password")}}
+
+            <button type="button" class="pw-toggle" onclick="togglePw('confirm_password',this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="match-msg" id="matchMsg"></div>
+        </div>
+
+        <button type="submit" class="btn-submit">ანგარიშის შექმნა →</button>
+      </form>
+
+      <div class="form-footer">
+        უკვე გაქვს ანგარიში? <a href="/login">შედი</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const eyeOpen  = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  const eyeClose = '<line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 01-4.24-4.24"/><path d="M6.53 6.53A10.94 10.94 0 001 12s4 8 11 8c2.54 0 4.9-.81 6.84-2.15"/>';
+
+  function togglePw(id, btn) {
+    const el = document.getElementById(id);
+    const show = el.type === 'password';
+    el.type = show ? 'text' : 'password';
+    btn.querySelector('svg').innerHTML = show ? eyeClose : eyeOpen;
+  }
+
+  const pwInput   = document.getElementById('password');
+  const pwFill    = document.getElementById('pwFill');
+  const pwHint    = document.getElementById('pwHint');
+  const confInput = document.getElementById('confirm_password');
+  const matchMsg  = document.getElementById('matchMsg');
+
+  const levels = [
+    { w:'0%',   bg:'transparent', label:'' },
+    { w:'25%',  bg:'#d94f4f',     label:'სუსტი' },
+    { w:'50%',  bg:'#e09a4f',     label:'საშუალო' },
+    { w:'75%',  bg:'#c8b44f',     label:'კარგი' },
+    { w:'100%', bg:'#4fad77',     label:'ძლიერი ✓' },
+  ];
+
+  pwInput.addEventListener('input', () => {
+    const v = pwInput.value;
+    let s = 0;
+    if (v.length >= 8) s++;
+    if (/[A-Z]/.test(v)) s++;
+    if (/[0-9]/.test(v)) s++;
+    if (/[^A-Za-z0-9]/.test(v)) s++;
+    const l = v ? (levels[s] || levels[4]) : levels[0];
+    pwFill.style.width = l.w;
+    pwFill.style.background = l.bg;
+    pwHint.textContent = l.label;
+    checkMatch();
+  });
+
+  confInput.addEventListener('input', checkMatch);
+
+  function checkMatch() {
+    if (!confInput.value) { matchMsg.className = 'match-msg'; return; }
+    if (confInput.value === pwInput.value) {
+      matchMsg.textContent = '✓ პაროლები ემთხვევა';
+      matchMsg.className = 'match-msg good';
+      confInput.classList.remove('err');
+    } else {
+      matchMsg.textContent = '✕ პაროლები არ ემთხვევა';
+      matchMsg.className = 'match-msg bad';
+      confInput.classList.add('err');
+    }
+  }
+</script>
+{% endblock %}

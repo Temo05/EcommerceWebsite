@@ -1,0 +1,495 @@
+{% extends 'base.html' %}
+{% block style %}
+ <style>
+    :root {
+      --bg:         #f7f5f2;
+      --white:      #ffffff;
+      --ink:        #1c1c28;
+      --ink2:       #3d3d52;
+      --muted:      #9090a8;
+      --sage:       #5b8c6e;
+      --sage2:      #7ab592;
+      --sage-light: #e8f3ed;
+      --blush:      #e8856a;
+      --blush-light:#fdf2ef;
+      --sky:        #5b8cb8;
+      --sky-light:  #eef4fb;
+      --border:     #e8e5e0;
+      --border2:    #d4d0ca;
+      --field-bg:   #faf9f7;
+      --red:        #d94f4f;
+      --shadow:     rgba(28,28,40,0.07);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--white); border-bottom: 1px solid var(--border);
+      height: 64px; display: flex; align-items: center;
+      padding: 0 2.5rem; gap: 2rem;
+    }
+    .navbar::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--sage), var(--blush), var(--sky));
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; flex-shrink: 0; }
+    .logo-mark { width: 36px; height: 36px; background: var(--sage); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+    .logo-mark svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .logo-text { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--ink); }
+    .nav-spacer { flex: 1; }
+    .nav-back { display: flex; align-items: center; gap: 0.4rem; font-size: 0.83rem; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-back:hover { color: var(--sage); }
+    .nav-back svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── PAGE ── */
+    .page-wrap { max-width: 1000px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+    /* ── LAYOUT ── */
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* ── CARD BASE ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-header-left { display: flex; align-items: center; gap: 0.6rem; }
+    .card-icon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-icon svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .card-icon.sage { background: var(--sage-light); color: var(--sage); }
+    .card-icon.sky  { background: var(--sky-light);  color: var(--sky); }
+    .card-icon.blush{ background: var(--blush-light); color: var(--blush); }
+    .card-title { font-size: 0.88rem; font-weight: 600; color: var(--ink); }
+    .card-body { padding: 1.4rem; }
+
+    .btn-delete {
+        width: 100%; padding: 0.68rem;
+        background: transparent;
+        border: 1.5px solid #f5c2c2; border-radius: 10px;
+        font-size: 0.85rem; font-weight: 500; color: var(--red);
+        font-family: 'Outfit', sans-serif;
+        display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+        text-decoration: none; margin-top: 0.65rem;
+        transition: border-color 0.2s, background 0.2s;
+      }
+      .btn-delete:hover { background: #fdf2f2; border-color: var(--red); color: var(--red); }
+      .btn-delete svg { width: 14px; height: 14px; }
+
+    /* ── LEFT COLUMN ── */
+    .left-col { display: flex; flex-direction: column; gap: 1.2rem; position: sticky; top: 80px; }
+
+    /* Profile hero */
+    .profile-hero {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.4rem 1.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-hero::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 72px;
+      background: linear-gradient(135deg, var(--sage-light), var(--sky-light));
+    }
+
+    .avatar-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 1rem;
+      z-index: 1;
+    }
+    .avatar {
+      width: 84px; height: 84px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--sage), var(--sky));
+      display: flex; align-items: center; justify-content: center;
+      border: 3px solid var(--white);
+      box-shadow: 0 4px 16px var(--shadow);
+      margin: 0 auto;
+    }
+    .avatar svg { width: 38px; height: 38px; stroke: #fff; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .avatar-online {
+      position: absolute; bottom: 3px; right: 3px;
+      width: 14px; height: 14px;
+      background: var(--sage2);
+      border-radius: 50%;
+      border: 2px solid var(--white);
+    }
+
+    .profile-username {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem; font-weight: 400; color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+    .profile-email { font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem; }
+
+    .profile-badges { display: flex; align-items: center; justify-content: center; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+    .pbadge {
+      padding: 0.22rem 0.7rem;
+      border-radius: 100px;
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .pbadge-verified { background: var(--sage-light); color: var(--sage); border: 1px solid rgba(91,140,110,0.25); }
+    .pbadge-google   { background: var(--sky-light);  color: var(--sky);  border: 1px solid rgba(91,140,110,0.15); }
+    .pbadge-unverified { background: #fff9ec; color: #c07c00; border: 1px solid #f0dfa0; }
+
+    .btn-logout {
+      width: 100%; padding: 0.68rem;
+      background: transparent;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 0.85rem; font-weight: 500; color: var(--muted);
+      font-family: 'Outfit', sans-serif; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .btn-logout:hover { border-color: var(--red); color: var(--red); background: #fdf2f2; }
+    .btn-logout svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── RIGHT COLUMN ── */
+    .right-col { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    /* Info rows */
+    .info-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-row:first-child { padding-top: 0; }
+    .info-label {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.2rem;
+    }
+    .info-value { font-size: 0.9rem; color: var(--ink); font-weight: 500; }
+    .info-left { }
+
+    .status-pill {
+      padding: 0.25rem 0.75rem;
+      border-radius: 100px;
+      font-size: 0.72rem; font-weight: 600;
+    }
+    .pill-yes  { background: var(--sage-light); color: var(--sage); }
+    .pill-no   { background: #fdf2f2; color: var(--red); }
+    .pill-google { background: var(--sky-light); color: var(--sky); display: flex; align-items: center; gap: 0.35rem; }
+    .pill-google svg { width: 13px; height: 13px; }
+
+    /* Password change */
+    .btn-change-pw {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: var(--field-bg);
+      border: 1.5px solid var(--border); border-radius: 9px;
+      font-size: 0.8rem; font-weight: 500; color: var(--ink2);
+      font-family: 'Outfit', sans-serif; cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .btn-change-pw:hover { border-color: var(--sage); color: var(--sage); }
+    .btn-change-pw svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* ── CART CARD ── */
+    .cart-item-row {
+      display: flex; align-items: center; gap: 0.85rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cart-item-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .cart-item-row:first-child { padding-top: 0; }
+
+    .ci-img {
+      width: 52px; height: 52px;
+      border-radius: 10px; overflow: hidden;
+      background: var(--field-bg); border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .ci-img img { width: 100%; height: 100%; object-fit: cover; }
+
+    .ci-info { flex: 1; min-width: 0; }
+    .ci-name {
+      font-size: 0.85rem; font-weight: 500; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 0.2rem;
+    }
+    .ci-qty { font-size: 0.75rem; color: var(--muted); }
+
+    .ci-price {
+      font-family: 'Fraunces', serif;
+      font-size: 1.05rem; font-weight: 400; color: var(--ink);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .ci-price small { font-size: 0.7rem; color: var(--muted); font-family: 'Outfit', sans-serif; }
+
+    /* Empty cart */
+    .cart-empty {
+      text-align: center; padding: 1.5rem 1rem;
+      color: var(--muted); font-size: 0.85rem;
+    }
+    .cart-empty svg { width: 32px; height: 32px; stroke: var(--border2); fill: none; stroke-width: 1.5; stroke-linecap: round; margin-bottom: 0.6rem; display: block; margin-left: auto; margin-right: auto; }
+
+    .cart-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 1rem; margin-top: 0.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .cart-total-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .cart-total-amount { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 400; color: var(--ink); }
+    .cart-total-amount small { font-size: 0.8rem; color: var(--muted); font-family: 'Outfit', sans-serif; margin-right: 1px; }
+
+    .btn-go-cart {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.6rem 1.1rem;
+      background: var(--sage); color: #fff;
+      border: none; border-radius: 9px;
+      font-size: 0.82rem; font-weight: 600;
+      font-family: 'Outfit', sans-serif; cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-go-cart:hover { background: #4a7a5e; transform: translateY(-1px); color: #fff; }
+    .btn-go-cart svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── MEMBER SINCE ── */
+    .member-card {
+      background: linear-gradient(135deg, var(--ink) 0%, #2c2c42 100%);
+      border: none;
+    }
+    .member-card .card-body {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 1.4rem;
+    }
+    .member-text { }
+    .member-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 0.25rem; }
+    .member-date { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 400; color: #fff; }
+    .member-icon {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .member-icon svg { width: 18px; height: 18px; stroke: var(--sage2); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Responsive */
+    @media (max-width: 780px) {
+      .profile-layout { grid-template-columns: 1fr; }
+      .left-col { position: static; }
+      .navbar { padding: 0 1rem; }
+      .page-wrap { padding: 1.5rem 1rem 3rem; }
+    }
+  </style>
+    {% endblock %}
+{% block content %}
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="/" class="nav-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    </div>
+    <span class="logo-text">შოპი</span>
+  </a>
+  <div class="nav-spacer"></div>
+  <a href="/" class="nav-back">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    მაღაზია
+  </a>
+</nav>
+
+<div class="page-wrap">
+  <div class="profile-layout">
+
+    <!-- ── LEFT ── -->
+    <div class="left-col">
+
+      <!-- Profile hero -->
+      <div class="profile-hero">
+        <div class="avatar-wrap">
+          <div class="avatar">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="avatar-online"></div>
+        </div>
+
+        <div class="profile-username">{{current_user.username}}</div>
+        <div class="profile-email">{{current_user.email}}</div>
+
+        <div class="profile-badges">
+          {% if current_user.is_verified %} <span class="pbadge pbadge-verified">✓ ვერიფიცირებული</span>  {% else %} <span class="pbadge pbadge-unverified">არა ვერფიცირებული</span> {% endif %}
+            {% if current_user.google_id %}
+          <span class="pbadge pbadge-google">
+            Google
+          </span>
+            {% endif %}
+        </div>
+
+        <a href="/logout" class="btn-logout">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          გამოსვლა
+        </a>
+        <form method="post" action="/delete_account/send_code">
+          <button type="submit" class="btn-delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          ანგარიშის წაშლა
+          </button>
+        </form>
+      </div>
+
+      <!-- Member since -->
+      <div class="card member-card">
+        <div class="card-body">
+          <div class="member-text">
+            <div class="member-label">წევრია</div>
+            <div class="member-date">{{created_at}}</div>
+          </div>
+          <div class="member-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── RIGHT ── -->
+    <div class="right-col">
+
+      <!-- Account info -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="card-icon sage">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <span class="card-title">ანგარიშის ინფორმაცია</span>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <div class="info-row">
+            <div class="info-left">
+              <div class="info-label">მომხმარებლის სახელი</div>
+              <div class="info-value">{{current_user.username}}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-left">
+              <div class="info-label">ელ-ფოსტა</div>
+              <div class="info-value">{{current_user.email}}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-left">
+              <div class="info-label">ვერიფიკაცია</div>
+            </div>
+              {% if current_user.is_verified %}
+                <span class="status-pill pill-yes">✓ დადასტურებულია</span>
+              {% else %}
+                <span class="status-pill pill-no">✕ არ არის</span>
+              {% endif %}
+          </div>
+
+          <div class="info-row">
+            <div class="info-left">
+              <div class="info-label">Google-ით რეგისტრაცია</div>
+            </div>
+              {% if current_user.google_id %}
+                <span class="status-pill pill-google">
+                  <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                  დიახ
+                </span>
+              {% else %}
+                <span class="status-pill pill-no">✕ არა</span>
+              {% endif %}
+          </div>
+
+          <div class="info-row">
+            <div class="info-left">
+              <div class="info-label">პაროლი</div>
+              <div class="info-value">••••••••••</div>
+            </div>
+            <a href="{{url_for('forgot_password')}}" class="btn-change-pw">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              შეცვლა
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Cart card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="card-icon blush">
+              <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            </div>
+            <span class="card-title">ჩემი კალათა</span>
+          </div>
+          <span style="font-size:0.75rem; color:var(--muted);">{{cart_items | count}} პროდუქტი</span>
+        </div>
+        <div class="card-body">
+
+           {% if cart_items %}
+              <div id="cartItems">
+                  {% for item in cart_items %}
+                    <div class="cart-item-row">
+                      <div class="ci-img">
+                        <img src="{{item.item.image_filename}}" alt="Sony"/>
+                      </div>
+                      <div class="ci-info">
+                        <div class="ci-name">{{item.item.name}}</div>
+                        <div class="ci-qty">რაოდენობა: {{item.quantity}}</div>
+                      </div>
+                      <div class="ci-price"><small>₾</small>{{'%.2f' | format(item.item.price)}}</div>
+                    </div>
+                  {% endfor %}
+              </div>
+            {% else %}
+              <div class="cart-empty" id="cartEmpty">
+                <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                კალათა ცარიელია
+              </div>
+            {% endif %}
+          <div class="cart-footer">
+            <div>
+              <div class="cart-total-label">სულ</div>
+              <div class="cart-total-amount"><small>₾</small>{{'%.2f' | format(full_price)}}</div>
+            </div>
+            <a href="/cart" class="btn-go-cart">
+              კალათაზე გადასვლა
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

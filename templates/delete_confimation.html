@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% block style %}
+<style>
+  :root {
+    --bg:         #f7f5f2;
+    --white:      #ffffff;
+    --ink:        #1c1c28;
+    --ink2:       #3d3d52;
+    --muted:      #9090a8;
+    --sage:       #5b8c6e;
+    --sage-light: #e8f3ed;
+    --blush:      #e8856a;
+    --sky:        #5b8cb8;
+    --border:     #e8e5e0;
+    --border2:    #d4d0ca;
+    --field-bg:   #faf9f7;
+    --red:        #d94f4f;
+    --red-light:  #fdf2f2;
+    --red-border: #f5c2c2;
+    --shadow:     rgba(28,28,40,0.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--red), #e8856a, var(--red));
+    z-index: 100;
+  }
+
+  .blob {
+    position: fixed; border-radius: 50%; filter: blur(90px);
+    pointer-events: none; z-index: 0;
+    animation: blobMove 18s ease-in-out infinite alternate;
+  }
+  .blob-1 { width: 440px; height: 440px; background: #f5c2c2; opacity: 0.3; top: -120px; right: -100px; animation-delay:0s; }
+  .blob-2 { width: 340px; height: 340px; background: #fdd9c4; opacity: 0.25; bottom: -80px; left: -80px; animation-delay:-8s; }
+  @keyframes blobMove {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(20px,15px) scale(1.05); }
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle, rgba(28,28,40,0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* Logo */
+  .site-logo {
+    position: fixed; top: 1.4rem; left: 2rem; z-index: 50;
+    display: flex; align-items: center; gap: 0.65rem; text-decoration: none;
+  }
+  .logo-mark { width: 36px; height: 36px; background: var(--sage); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+  .logo-mark svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .logo-text { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--ink); }
+
+  /* Shell */
+  .page-shell {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 5rem 1rem 2rem;
+    position: relative; z-index: 1;
+  }
+
+  /* Card */
+  .auth-card {
+    width: 100%; max-width: 420px;
+    background: var(--white);
+    border: 1px solid var(--red-border);
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(217,79,79,0.06), 0 12px 40px rgba(217,79,79,0.1);
+    overflow: hidden;
+    animation: cardPop 0.5s cubic-bezier(.22,.68,0,1.15) both;
+  }
+  @keyframes cardPop {
+    from { opacity: 0; transform: scale(0.96) translateY(14px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Card header */
+  .card-icon-header {
+    padding: 2rem 2rem 0;
+    display: flex; align-items: flex-start; gap: 1rem;
+  }
+  .header-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: var(--red-light);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .header-icon svg { width: 24px; height: 24px; stroke: var(--red); fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+  .header-text { padding-top: 0.2rem; }
+  .header-text h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem; font-weight: 400; color: var(--ink);
+    line-height: 1.2; margin-bottom: 0.3rem;
+  }
+  .header-text h1 em { font-style: italic; color: var(--red); }
+  .header-text p { font-size: 0.82rem; color: var(--muted); line-height: 1.55; }
+  .header-text p strong { color: var(--ink2); font-weight: 500; }
+
+  /* Warning banner */
+  .warning-banner {
+    margin: 1.4rem 2rem 0;
+    padding: 0.85rem 1rem;
+    background: #fff9ec;
+    border: 1px solid #f0dfa0;
+    border-radius: 10px;
+    font-size: 0.8rem; color: #8a6d00;
+    line-height: 1.55;
+    display: flex; align-items: flex-start; gap: 0.5rem;
+  }
+  .warning-banner svg { width: 14px; height: 14px; stroke: #c07c00; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; margin-top: 1px; }
+
+  /* Card body */
+  .card-body { padding: 1.4rem 2rem 2rem; }
+
+  /* Error card */
+  .error-card {
+    display: flex; align-items: flex-start; gap: 0.6rem;
+    padding: 0.8rem 1rem;
+    background: var(--red-light);
+    border: 1px solid var(--red-border);
+    border-radius: 10px;
+    margin-bottom: 1.2rem;
+  }
+  .error-card svg { width: 15px; height: 15px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; margin-top: 1px; }
+  .error-card p { font-size: 0.82rem; color: var(--red); line-height: 1.5; }
+
+  .btn-resend-link {
+    background: none;
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.8rem;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .btn-resend-link:hover { color: var(--red); }
+  /* OTP */
+  .otp-label {
+    display: block; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink2); margin-bottom: 0.8rem; text-align: center;
+  }
+  .otp-wrap {
+    display: flex; gap: 0.65rem; justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+  .otp-box {
+    width: 58px; height: 66px;
+    background: var(--field-bg);
+    border: 1.5px solid var(--border); border-radius: 12px;
+    font-family: 'Fraunces', serif;
+    font-size: 1.9rem; font-weight: 400; color: var(--ink);
+    text-align: center; outline: none;
+    caret-color: var(--red);
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.18s;
+    -moz-appearance: textfield;
+  }
+  .otp-box::-webkit-outer-spin-button,
+  .otp-box::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .otp-box:focus { border-color: var(--red); background: #fff; box-shadow: 0 0 0 3px rgba(217,79,79,0.1); transform: translateY(-2px); }
+  .otp-box.filled { border-color: #f5a0a0; background: var(--red-light); color: var(--red); }
+  .otp-box.is-err { border-color: var(--red); background: var(--red-light); animation: shake .35s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+  .otp-hint { font-size: 0.75rem; color: var(--muted); text-align: center; margin-bottom: 1.5rem; }
+
+  input[type="hidden"] { display: none; }
+
+  /* Divider */
+  .form-divider { height: 1px; background: var(--border); margin: 1.2rem 0; }
+
+  /* Buttons */
+  .btn-delete-confirm {
+    width: 100%; padding: 0.85rem;
+    background: var(--red); color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 0.92rem; font-weight: 600;
+    font-family: 'Outfit', sans-serif; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    transition: background 0.22s, transform 0.15s, box-shadow 0.22s;
+    letter-spacing: 0.02em;
+  }
+  .btn-delete-confirm svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .btn-delete-confirm:hover { background: #c03a3a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(217,79,79,0.3); }
+  .btn-delete-confirm:active { transform: translateY(0); }
+
+  .btn-cancel {
+    width: 100%; padding: 0.78rem;
+    background: transparent; color: var(--muted);
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 0.88rem; font-weight: 500;
+    font-family: 'Outfit', sans-serif; cursor: pointer;
+    margin-top: 0.65rem;
+    transition: border-color 0.2s, color 0.2s;
+    text-decoration: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-cancel:hover { border-color: var(--border2); color: var(--ink2); }
+
+  @media (max-width: 480px) {
+    .auth-card { border-radius: 16px; }
+    .card-icon-header { padding: 1.6rem 1.4rem 0; }
+    .card-body { padding: 1.4rem 1.4rem 1.6rem; }
+    .warning-banner { margin: 1.2rem 1.4rem 0; }
+    .otp-box { width: 48px; height: 58px; font-size: 1.6rem; }
+    .otp-wrap { gap: 0.5rem; }
+    .site-logo { left: 1.2rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<a href="/" class="site-logo">
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+  </div>
+  <span class="logo-text">შოპი</span>
+</a>
+
+<div class="page-shell">
+  <div style="width:100%; max-width:420px;">
+
+    <div class="auth-card">
+
+      <div class="card-icon-header">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </div>
+        <div class="header-text">
+          <h1>ანგარიშის <em>წაშლა</em></h1>
+          <p>დადასტურების კოდი გამოგეგზავნა <strong>{{ current_user.email }}</strong>-ზე.</p>
+        </div>
+      </div>
+
+      <div class="warning-banner">
+        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        ეს მოქმედება შეუქცევადია — ანგარიში და ყველა მონაცემი სამუდამოდ წაიშლება.
+      </div>
+
+      <div class="card-body">
+
+        {% if error %}
+            <div class="error-card">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <p>{{ error }}</p>
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{{url_for('delete_account')}}" id="deleteForm">
+
+          <label class="otp-label">დადასტურების კოდი</label>
+
+          <div class="otp-wrap">
+            <input class="otp-box" type="number" name="num1" inputmode="numeric" min="0" max="9" data-idx="0" autocomplete="one-time-code"/>
+            <input class="otp-box" type="number" name="num2" inputmode="numeric" min="0" max="9" data-idx="1"/>
+            <input class="otp-box" type="number" name="num3" inputmode="numeric" min="0" max="9" data-idx="2"/>
+            <input class="otp-box" type="number" name="num4" inputmode="numeric" min="0" max="9" data-idx="3"/>
+          </div>
+
+          <div class="otp-hint">4-ნიშნა კოდი შენი ელ-ფოსტიდან</div>
+
+          <input type="hidden" name="code" id="codeHidden"/>
+
+          <button type="submit" class="btn-delete-confirm">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            ანგარიშის სამუდამოდ წაშლა
+          </button>
+
+        </form>
+
+        <a href="/profile" class="btn-cancel">გაუქმება</a>
+        <form method="post" action="/delete_account/send_code">
+          <button type="submit" class="btn-resend-link">კოდი არ მოვიდა? ახლიდან გაგზავნა</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const boxes     = Array.from(document.querySelectorAll('.otp-box'));
+  const codeHidden = document.getElementById('codeHidden');
+
+  boxes.forEach((box, i) => {
+    box.addEventListener('input', e => {
+      const raw = e.target.value.replace(/\D/g, '');
+      if (raw.length > 1) {
+        raw.slice(0, 4).split('').forEach((d, j) => { if (boxes[j]) boxes[j].value = d; });
+        boxes[Math.min(3, raw.length - 1)].focus();
+        syncCode(); return;
+      }
+      box.value = raw ? raw[raw.length - 1] : '';
+      box.classList.toggle('filled', box.value !== '');
+      syncCode();
+      if (raw && i < 3) boxes[i + 1].focus();
+    });
+
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        boxes[i - 1].value = '';
+        boxes[i - 1].classList.remove('filled');
+        boxes[i - 1].focus();
+        syncCode();
+      }
+    });
+
+    box.addEventListener('paste', e => {
+      e.preventDefault();
+      const txt = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      txt.slice(0, 4).split('').forEach((d, j) => {
+        if (boxes[j]) { boxes[j].value = d; boxes[j].classList.add('filled'); }
+      });
+      boxes[Math.min(3, txt.length - 1)].focus();
+      syncCode();
+    });
+  });
+
+  function syncCode() {
+    codeHidden.value = boxes.map(b => b.value).join('');
+  }
+
+  boxes[0].focus();
+</script>
+{% endblock %}

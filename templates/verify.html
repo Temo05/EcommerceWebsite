@@ -1,0 +1,516 @@
+{% extends 'base.html' %}
+{% block style %}
+ <style>
+    :root {
+      --bg:        #ffffff;
+      --bg2:       #f7f5f2;
+      --ink:       #1c1c28;
+      --ink2:      #3d3d52;
+      --muted:     #9090a8;
+      --sage:      #5b8c6e;
+      --sage2:     #7ab592;
+      --sage-light:#e8f3ed;
+      --blush:     #e8856a;
+      --sky:       #5b8cb8;
+      --border:    #e8e5e0;
+      --border2:   #d4d0ca;
+      --field-bg:  #faf9f7;
+      --red:       #d94f4f;
+      --green:     #4fad77;
+      --shadow:    rgba(28,28,40,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg2);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── Top stripe ── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--sage), var(--blush), var(--sky));
+      z-index: 100;
+    }
+
+    /* ── Soft background shapes ── */
+    .bg-shape {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      animation: shapeMove 20s ease-in-out infinite alternate;
+    }
+    .bg-shape-1 { width: 500px; height: 500px; background: #c8e4d4; opacity: 0.45; top: -160px; right: -140px; animation-delay: 0s; }
+    .bg-shape-2 { width: 380px; height: 380px; background: #c4d8f0; opacity: 0.35; bottom: -120px; left: -100px; animation-delay: -8s; }
+    .bg-shape-3 { width: 260px; height: 260px; background: #f5cfc4; opacity: 0.3;  top: 50%; left: 55%; animation-delay: -14s; }
+    @keyframes shapeMove {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(24px,18px) scale(1.05); }
+    }
+
+    /* ── Shell ── */
+    .verify-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 1rem 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Logo ── */
+    .site-logo {
+      position: fixed;
+      top: 1.4rem; left: 2rem;
+      display: flex; align-items: center; gap: 0.65rem;
+      text-decoration: none;
+      z-index: 50;
+    }
+    .logo-mark {
+      width: 36px; height: 36px;
+      background: var(--sage);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .logo-text { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--ink); }
+
+    /* ── Card ── */
+    .verify-card {
+      width: 100%;
+      max-width: 460px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.8rem 3rem 2.4rem;
+      box-shadow:
+        0 1px 2px rgba(28,28,40,0.04),
+        0 8px 32px rgba(28,28,40,0.08),
+        0 32px 80px rgba(28,28,40,0.06);
+      animation: cardPop 0.55s cubic-bezier(.22,.68,0,1.15) both;
+      position: relative;
+      z-index: 2;
+    }
+    @keyframes cardPop {
+      from { opacity: 0; transform: scale(0.95) translateY(16px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ── Icon ── */
+    .verify-icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.6rem;
+    }
+    .verify-icon {
+      width: 68px; height: 68px;
+      background: var(--sage-light);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .verify-icon svg { width: 30px; height: 30px; stroke: var(--sage); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    /* Pulse ring */
+    .verify-icon::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 24px;
+      border: 1.5px solid rgba(91,140,110,0.2);
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    .verify-icon::after {
+      content: '';
+      position: absolute;
+      inset: -16px;
+      border-radius: 30px;
+      border: 1px solid rgba(91,140,110,0.1);
+      animation: pulse 2.5s ease-in-out infinite 0.5s;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(1.04); }
+    }
+
+    /* ── Heading ── */
+    .verify-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.9rem; font-weight: 400;
+      text-align: center; color: var(--ink);
+      line-height: 1.2; margin-bottom: 0.55rem;
+    }
+    .verify-title em { font-style: italic; color: var(--sage); }
+
+    .verify-sub {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .verify-sub strong { color: var(--ink2); font-weight: 500; }
+
+    /* ── OTP ── */
+    .otp-wrap {
+      display: flex;
+      gap: 0.65rem;
+      justify-content: center;
+      margin-bottom: 0.7rem;
+    }
+
+    .otp-box {
+      width: 56px; height: 64px;
+      background: var(--field-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Fraunces', serif;
+      font-size: 1.9rem; font-weight: 400;
+      color: var(--ink);
+      text-align: center;
+      outline: none;
+      caret-color: var(--sage);
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.18s;
+      -moz-appearance: textfield;
+    }
+    .otp-box::-webkit-outer-spin-button,
+    .otp-box::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    .otp-box:focus {
+      border-color: var(--sage);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(91,140,110,0.14);
+      transform: translateY(-3px);
+    }
+    .otp-box.filled {
+      border-color: var(--sage2);
+      background: var(--sage-light);
+      color: var(--sage);
+    }
+    .otp-box.err {
+      border-color: var(--red);
+      background: #fdf2f2;
+      animation: shake 0.38s ease;
+    }
+    .otp-box.success {
+      border-color: var(--green);
+      background: #f0faf4;
+      color: var(--green);
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-5px); }
+      75%      { transform: translateX(5px); }
+    }
+
+    #code-hidden { display: none; }
+
+    /* ── Progress dots ── */
+    .otp-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+    .otp-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border2);
+      transition: background 0.25s, transform 0.25s;
+    }
+    .otp-dot.active { background: var(--sage); transform: scale(1.25); }
+
+    /* ── Timer ── */
+    .timer-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .timer-ring-wrap {
+      position: relative;
+      width: 36px; height: 36px;
+    }
+    .timer-ring {
+      width: 36px; height: 36px;
+      transform: rotate(-90deg);
+    }
+    .timer-track { fill: none; stroke: var(--border); stroke-width: 3; }
+    .timer-fill  { fill: none; stroke: var(--sage); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 88; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear, stroke 0.5s; }
+    .timer-num {
+      position: absolute;
+      inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 600; color: var(--ink2);
+    }
+    .timer-text { font-size: 0.83rem; color: var(--muted); }
+    .timer-text span { color: var(--ink2); font-weight: 500; }
+
+    /* ── Flash ── */
+    .flash { padding: 0.7rem 1rem; border-radius: 8px; font-size: 0.82rem; margin-bottom: 1rem; }
+    .flash-error   { background: #fdf2f2; border: 1px solid #f5c2c2; color: var(--red); }
+    .flash-success { background: #f0faf4; border: 1px solid #b8e8cc; color: var(--green); }
+    .flash-warning { background: #fffbf0; border: 1px solid #f0dfa0; color: #8a6d00; }
+
+    /* ── Submit ── */
+    .btn-submit {
+      width: 100%; padding: 0.82rem;
+      background: var(--sage); color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 0.92rem; font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer; letter-spacing: 0.02em;
+      transition: background 0.22s, transform 0.15s, box-shadow 0.22s;
+    }
+    .btn-submit:hover { background: #4a7a5e; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(91,140,110,0.28); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { background: var(--border2); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── Resend ── */
+    .resend-row {
+      text-align: center;
+      margin-top: 1.2rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .btn-resend {
+      background: none; border: none; padding: 0;
+      color: var(--sage); font-family: 'Outfit', sans-serif;
+      font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; transition: color 0.2s;
+    }
+    .btn-resend:hover { color: #4a7a5e; text-decoration: underline; }
+    .btn-resend:disabled { color: var(--muted); cursor: not-allowed; text-decoration: none; }
+
+    /* ── Back link ── */
+    .back-link {
+      display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+      margin-top: 0.9rem;
+      font-size: 0.8rem; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--sage); }
+    .back-link svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      .verify-card { padding: 2.2rem 1.6rem 2rem; border-radius: 16px; }
+      .otp-box { width: 44px; height: 54px; font-size: 1.6rem; border-radius: 10px; }
+      .otp-wrap { gap: 0.45rem; }
+      .site-logo { left: 1.2rem; }
+    }
+  </style>
+    {% endblock %}
+{% block content %}
+<div class="bg-shape bg-shape-1"></div>
+<div class="bg-shape bg-shape-2"></div>
+<div class="bg-shape bg-shape-3"></div>
+
+<a href="/" class="site-logo">
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+  </div>
+  <span class="logo-text">შოპი</span>
+</a>
+
+<div class="verify-shell">
+  <div class="verify-card">
+
+    <!-- Icon -->
+    <div class="verify-icon-wrap">
+      <div class="verify-icon">
+        <svg viewBox="0 0 24 24">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/>
+        </svg>
+      </div>
+    </div>
+
+    <h1 class="verify-title">შეამოწმე<br/><em>ელ-ფოსტა</em></h1>
+
+    <p class="verify-sub">
+      4-ნიშნა კოდი გამოგეგზავნა<br/>
+      <strong>{{user.email}}</strong>-ზე.<br/>
+      კოდი მოქმედია 15 წუთი.
+    </p>
+
+  <form action="{{url_for('verify', id=user.id)}}" method="post">
+      {% if error %}
+          <div class="flash flash-error" id="errBox2">{{ error }}</div>
+      {% endif %}
+          <div class="flash flash-error" style="display: none" id="errBox"></div>
+
+      <div class="otp-wrap" id="otpWrap">
+        <input class="otp-box" type="number" name="otp0" inputmode="numeric" min="0" max="9" data-idx="0" autocomplete="one-time-code"/>
+        <input class="otp-box" type="number" name="otp1" inputmode="numeric" min="0" max="9" data-idx="1"/>
+        <input class="otp-box" type="number" name="otp2" inputmode="numeric" min="0" max="9" data-idx="2"/>
+        <input class="otp-box" type="number" name="otp3" inputmode="numeric" min="0" max="9" data-idx="3"/>
+      </div>
+
+      <!-- Progress dots -->
+      <div class="otp-dots" id="otpDots">
+        <div class="otp-dot" data-d="0"></div>
+        <div class="otp-dot" data-d="1"></div>
+        <div class="otp-dot" data-d="2"></div>
+        <div class="otp-dot" data-d="3"></div>
+      </div>
+
+      <!-- Timer -->
+      <div class="timer-wrap">
+        <div class="timer-ring-wrap">
+          <svg class="timer-ring" viewBox="0 0 36 36">
+            <circle class="timer-track" cx="18" cy="18" r="14"/>
+            <circle class="timer-fill"  cx="18" cy="18" r="14" id="timerArc"/>
+          </svg>
+          <div class="timer-num" id="timerNum">15</div>
+        </div>
+        <div class="timer-text">ვადა: <span id="timerDisplay">15:00</span></div>
+      </div>
+
+      <input type="hidden" name="code" id="codeHidden"/>
+
+      <button type="submit" class="btn-submit" id="submitBtn" disabled>
+        კოდის დადასტურება
+      </button>
+    </form>
+
+    <div class="resend-row">
+      კოდი არ მოვიდა?&nbsp;
+      <button class="btn-resend" id="resendBtn" onclick="resendCode()">ახლიდან გაგზავნა</button>
+    </div>
+
+    <a href="/register" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      სხვა ანგარიშით რეგისტრაცია
+    </a>
+
+  </div>
+</div>
+
+<script>
+  const boxes      = Array.from(document.querySelectorAll('.otp-box'));
+  const dots       = Array.from(document.querySelectorAll('.otp-dot'));
+  const codeHidden = document.getElementById('codeHidden');
+  const submitBtn  = document.getElementById('submitBtn');
+  const resendBtn  = document.getElementById('resendBtn');
+
+  /* ── OTP logic ─────────────────────── */
+  function getCode() { return boxes.map(b => b.value).join(''); }
+
+  function syncUI() {
+    const code = getCode();
+    codeHidden.value = code;
+    boxes.forEach((b, i) => {
+      b.classList.toggle('filled', b.value !== '');
+    });
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i < code.length);
+    });
+    submitBtn.disabled = code.length < 4;
+  }
+
+  boxes.forEach((box, i) => {
+    box.addEventListener('input', e => {
+      const raw = e.target.value.replace(/\D/g, '');
+      if (raw.length > 1) {
+        raw.slice(0, 6).split('').forEach((d, j) => { if (boxes[j]) boxes[j].value = d; });
+        boxes[Math.min(5, raw.length - 1)].focus();
+        syncUI(); return;
+      }
+      box.value = raw ? raw[raw.length - 1] : '';
+      syncUI();
+      if (raw && i < 5) boxes[i + 1].focus();
+    });
+
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        boxes[i - 1].value = '';
+        boxes[i - 1].focus();
+        syncUI();
+      }
+      if (e.key === 'ArrowLeft'  && i > 0) boxes[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < 5) boxes[i + 1].focus();
+    });
+
+    box.addEventListener('paste', e => {
+      e.preventDefault();
+      const txt = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      txt.slice(0, 6).split('').forEach((d, j) => { if (boxes[j]) boxes[j].value = d; });
+      boxes[Math.min(5, txt.length - 1)].focus();
+      syncUI();
+    });
+  });
+
+  /* ── Timer ─────────────────────────── */
+  const timerDisplay = document.getElementById('timerDisplay');
+  const timerNum     = document.getElementById('timerNum');
+  const timerArc     = document.getElementById('timerArc');
+  const TOTAL        = 15 * 60;
+  const CIRCUMF      = 88; // 2π × 14
+  let remaining      = TOTAL;
+
+  const tick = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(tick);
+      timerDisplay.textContent = '00:00';
+      timerArc.style.stroke = 'var(--red)';
+      timerNum.textContent  = '0';
+      resendBtn.disabled = false;
+      return;
+    }
+    const m  = Math.floor(remaining / 60);
+    const s  = remaining % 60;
+    timerDisplay.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    timerNum.textContent = m;
+    // Arc: shrink as time passes
+    const ratio = remaining / TOTAL;
+    timerArc.style.strokeDashoffset = CIRCUMF * (1 - ratio);
+    if (remaining <= 60) timerArc.style.stroke = 'var(--red)';
+    else if (remaining <= 5 * 60) timerArc.style.stroke = 'var(--blush)';
+  }, 1000);
+
+  /* ── Resend ────────────────────────── */
+  function resendCode() {
+    fetch('/send_code?id={{user.id}}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data["Success"]) {
+        document.getElementById("errBox2")?.style.setProperty("display", "none");
+        document.getElementById("errBox")?.style.setProperty("display", "none");
+
+        syncUI();
+      } else {
+        document.getElementById("errBox2")?.style.setProperty("display", "none");
+        const err_text = document.getElementById("errBox");
+        if (err_text){
+            err_text.textContent = data["error"];
+            err_text.style.display = "block";
+        }
+      }
+    });
+  }
+
+  /* ── Form submit ───────────────────── */
+  document.getElementById('verifyForm').addEventListener('submit', e => {
+    codeHidden.value = getCode();
+    if (getCode().length < 6) { e.preventDefault(); }
+  });
+
+  boxes[0].focus();
+</script>
+{% endblock %}

@@ -1,0 +1,579 @@
+{% extends 'base.html' %}
+{% block style %}
+    <style>
+    :root {
+      --bg:        #f7f5f2;
+      --white:     #ffffff;
+      --ink:       #1c1c28;
+      --ink2:      #3d3d52;
+      --muted:     #9090a8;
+      --sage:      #5b8c6e;
+      --sage2:     #7ab592;
+      --sage-light:#e8f3ed;
+      --blush:     #e8856a;
+      --sky:       #5b8cb8;
+      --border:    #e8e5e0;
+      --border2:   #d4d0ca;
+      --field-bg:  #faf9f7;
+      --red:       #d94f4f;
+      --shadow:    rgba(28,28,40,0.07);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+    /* Top bar */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--sage), var(--blush), var(--sky));
+    }
+    .topbar-left { display: flex; align-items: center; gap: 1rem; }
+    .logo-mark {
+      width: 34px; height: 34px; background: var(--sage); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 17px; height: 17px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .logo-text { font-family: 'Fraunces', serif; font-size: 1.2rem; color: var(--ink); }
+    .topbar-divider { width: 1px; height: 20px; background: var(--border); }
+    .topbar-title { font-size: 0.82rem; color: var(--muted); font-weight: 400; }
+
+    .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+    .badge-admin {
+      padding: 0.25rem 0.75rem;
+      background: var(--sage-light);
+      color: var(--sage);
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .btn-back {
+      display: flex; align-items: center; gap: 0.35rem;
+      font-size: 0.82rem; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .btn-back:hover { color: var(--sage); }
+    .btn-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* Page layout */
+    .page-wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+      animation: fadeUp 0.45s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 2rem; font-weight: 400;
+      color: var(--ink); line-height: 1.2; margin-bottom: 0.3rem;
+    }
+    .page-header h1 em { font-style: italic; color: var(--sage); }
+    .page-header p { font-size: 0.85rem; color: var(--muted); }
+
+    /* Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .card-header-icon {
+      width: 32px; height: 32px;
+      background: var(--sage-light);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-header-icon svg { width: 15px; height: 15px; stroke: var(--sage); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .card-header-text h3 { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
+    .card-header-text p  { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+    .card-body { padding: 1.5rem; }
+
+    /* Fields */
+    .field-group { margin-bottom: 1.1rem; }
+    .field-group:last-child { margin-bottom: 0; }
+
+    .field-label {
+      display: block;
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink2); margin-bottom: 0.42rem;
+    }
+    .field-label span { color: var(--red); margin-left: 2px; }
+
+    .field-input, .field-textarea, .field-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--field-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--ink);
+      font-size: 0.9rem; font-family: 'Outfit', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .field-input::placeholder,
+    .field-textarea::placeholder { color: var(--muted); font-size: 0.84rem; }
+    .field-input:focus,
+    .field-textarea:focus,
+    .field-select:focus {
+      border-color: var(--sage);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(91,140,110,0.12);
+    }
+    .field-textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+
+    /* Price input with symbol */
+    .price-wrap { position: relative; }
+    .price-prefix {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 0.88rem; color: var(--muted); font-weight: 500; pointer-events: none;
+    }
+    .price-wrap .field-input { padding-left: 2rem; }
+
+    /* Hint */
+    .field-hint { font-size: 0.72rem; color: var(--muted); margin-top: 0.35rem; }
+
+    /* ── Image upload ── */
+    .upload-zone {
+      border: 2px dashed var(--border2);
+      border-radius: 12px;
+      padding: 2rem 1rem;
+      text-align: center;
+      background: var(--field-bg);
+      cursor: pointer;
+      transition: border-color 0.25s, background 0.25s;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag { border-color: var(--sage); background: var(--sage-light); }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon {
+      width: 44px; height: 44px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 0.8rem;
+    }
+    .upload-icon svg { width: 20px; height: 20px; stroke: var(--sage); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .upload-title { font-size: 0.88rem; font-weight: 500; color: var(--ink2); margin-bottom: 0.25rem; }
+    .upload-sub   { font-size: 0.75rem; color: var(--muted); }
+    .upload-sub strong { color: var(--sage); }
+
+    /* Preview */
+    .preview-wrap {
+      display: none;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--field-bg);
+      border: 1.5px solid var(--border);
+    }
+    .preview-wrap.show { display: block; }
+    .preview-wrap img {
+      width: 100%; height: 220px;
+      object-fit: cover; display: block;
+    }
+    .preview-overlay {
+      position: absolute; inset: 0;
+      background: rgba(28,28,40,0.45);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .preview-wrap:hover .preview-overlay { opacity: 1; }
+    .preview-change {
+      background: #fff; color: var(--ink);
+      border: none; border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem; font-weight: 500;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer; display: flex; align-items: center; gap: 0.4rem;
+    }
+    .preview-change svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* Image info */
+    .img-info {
+      display: none; margin-top: 0.75rem;
+      padding: 0.6rem 0.8rem;
+      background: var(--sage-light);
+      border-radius: 8px;
+      font-size: 0.75rem; color: var(--sage);
+      display: none; align-items: center; gap: 0.5rem;
+    }
+    .img-info.show { display: flex; }
+    .img-info svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+
+    /* Stock indicator */
+    .stock-wrap { position: relative; }
+    .stock-badge {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      font-size: 0.7rem; padding: 0.2rem 0.55rem;
+      border-radius: 6px; font-weight: 500; pointer-events: none;
+    }
+    .stock-wrap .field-input { padding-right: 5rem; }
+
+    /* Submit area */
+    .submit-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .btn-submit {
+      width: 100%; padding: 0.85rem;
+      background: var(--sage); color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 0.92rem; font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer; letter-spacing: 0.02em;
+      transition: background 0.22s, transform 0.15s, box-shadow 0.22s;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .btn-submit svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-submit:hover { background: #4a7a5e; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(91,140,110,0.28); }
+    .btn-submit:active { transform: translateY(0); }
+
+    .btn-draft {
+      width: 100%; padding: 0.75rem;
+      background: transparent; color: var(--muted);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.88rem; font-weight: 500;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer; margin-top: 0.65rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-draft:hover { border-color: var(--border2); color: var(--ink2); }
+
+    /* Checklist */
+    .checklist { margin-top: 1.2rem; }
+    .check-item {
+      display: flex; align-items: center; gap: 0.55rem;
+      font-size: 0.8rem; color: var(--muted);
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+    .check-item:last-child { border-bottom: none; }
+    .check-item.done { color: var(--sage); }
+    .check-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1.5px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.2s, border-color 0.2s;
+    }
+    .check-item.done .check-dot { background: var(--sage); border-color: var(--sage); }
+    .check-dot svg { width: 9px; height: 9px; stroke: #fff; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; display: none; }
+    .check-item.done .check-dot svg { display: block; }
+
+    /* Flash */
+    .flash { padding: 0.7rem 1rem; border-radius: 8px; font-size: 0.82rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+    .flash-error   { background: #fdf2f2; border: 1px solid #f5c2c2; color: var(--red); }
+    .flash-success { background: #f0faf4; border: 1px solid #b8e8cc; color: #4fad77; }
+
+    @media (max-width: 800px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .topbar { padding: 0 1rem; }
+    }
+    @media (max-width: 480px) {
+      .field-row { grid-template-columns: 1fr; }
+      .page-wrap { padding: 1.5rem 1rem 3rem; }
+    }
+    </style>
+{% endblock %}
+{% block content %}
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="/" style="text-decoration:none; display:flex; align-items:center; gap:0.7rem;">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      </div>
+      <span class="logo-text">შოპი</span>
+    </a>
+    <div class="topbar-divider"></div>
+    <span class="topbar-title">ადმინ პანელი</span>
+  </div>
+  <div class="topbar-right">
+    <span class="badge-admin">Admin</span>
+    <a href="/" class="btn-back">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      მაღაზია
+    </a>
+  </div>
+</div>
+
+<!-- Page -->
+<div class="page-wrap">
+
+  <div class="page-header">
+    <h1>ახალი <em>პროდუქტი</em></h1>
+    <p>შეავსე ველები და გამოაქვეყნე მაღაზიაში</p>
+  </div>
+
+  <form method="POST" action="{{url_for('add_item')}}" enctype="multipart/form-data" id="itemForm">
+    {{ form.hidden_tag() }}
+    <div class="form-grid">
+
+      <!-- LEFT COLUMN -->
+      <div style="display:flex; flex-direction:column; gap:1.2rem;">
+
+        <!-- Basic info -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div class="card-header-text">
+              <h3>ძირითადი ინფორმაცია</h3>
+              <p>პროდუქტის სახელი და აღწერა</p>
+            </div>
+          </div>
+          <div class="card-body">
+
+            <div class="field-group">
+                {{form.name.label(class="field-label")}}
+                {{form.name(class="field-input", id="name", placeholder="მაგ: Sony WH-1000XM5 ყურსასმენი", autocomplete="off")}}
+            </div>
+
+            <div class="field-group">
+                {{form.description.label(class="field-label")}}
+                {{form.description(class="field-textarea", id="description", placeholder="დეტალური აღწერა — მახასიათებლები, სპეციფიკაცია, ინფორმაცია...")}}
+              <div class="field-hint">რაც უფრო დეტალური, მით უფრო მეტი გაყიდვა</div>
+            </div>
+        <div class="field-group">
+            <label class="field-label">
+                {{ form.type.label.text }} <span>*</span>
+            </label>
+
+            {{ form.type(class="form-select") }}
+
+            {% for error in form.type.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        </div>
+          </div>
+        </div>
+
+        <!-- Pricing & Stock -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <div class="card-header-text">
+              <h3>ფასი და მარაგი</h3>
+              <p>გაყიდვის პირობები</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="field-row">
+              <div class="field-group">
+                {{form.price.label(class="field-label")}}
+                <div class="price-wrap">
+                  <span class="price-prefix">₾</span>
+                    {{form.price(class="field-input", id="price", placeholder="0.00", step="0.01")}}
+                </div>
+              </div>
+              <div class="field-group">
+                  {{form.stock.label(class="field-label")}}
+                <div class="stock-wrap">
+                    {{form.stock(class="field-input", id="stock", placeholder="0", step="1")}}
+
+                  <span class="stock-badge" id="stockBadge" style="display:none;"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex; flex-direction:column; gap:1.2rem;">
+
+        <!-- Image upload -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="card-header-text">
+              <h3>პროდუქტის ფოტო</h3>
+              <p>JPG, PNG, WEBP — მაქს. 5MB</p>
+            </div>
+          </div>
+          <div class="card-body">
+
+            <!-- Preview -->
+            <div class="preview-wrap" id="previewWrap">
+              <img id="previewImg" src="" alt="preview"/>
+              <div class="preview-overlay">
+                <button type="button" class="preview-change" onclick="document.getElementById('image').click()">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  შეცვლა
+                </button>
+              </div>
+            </div>
+
+            <!-- Upload zone -->
+            <div class="upload-zone" id="uploadZone">
+                {{form.img(id="image", accept="image/png,image/jpeg,image/webp")}}
+              <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="upload-title">ფოტოს ატვირთვა</div>
+              <div class="upload-sub">გადმოათრიე ან <strong>აირჩიე ფაილი</strong></div>
+            </div>
+
+            <div class="img-info" id="imgInfo">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              <span id="imgName">ფოტო მიბმულია</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Submit + checklist -->
+        <div class="submit-card">
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            გამოქვეყნება
+          </button>
+
+
+          <div class="checklist" id="checklist">
+            <div class="check-item" id="chk-name">
+              <div class="check-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              სახელი შევსებულია
+            </div>
+            <div class="check-item" id="chk-desc">
+              <div class="check-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              აღწერა შევსებულია
+            </div>
+            <div class="check-item" id="chk-price">
+              <div class="check-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              ფასი მითითებულია
+            </div>
+            <div class="check-item" id="chk-stock">
+              <div class="check-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              მარაგი მითითებულია
+            </div>
+            <div class="check-item" id="chk-img">
+              <div class="check-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              ფოტო ატვირთულია
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  /* ── Image preview ── */
+  const imageInput  = document.getElementById('image');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewImg  = document.getElementById('previewImg');
+  const uploadZone  = document.getElementById('uploadZone');
+  const imgInfo     = document.getElementById('imgInfo');
+  const imgName     = document.getElementById('imgName');
+
+  imageInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    previewImg.src = url;
+    previewWrap.classList.add('show');
+    uploadZone.style.display = 'none';
+    imgInfo.classList.add('show');
+    imgName.textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
+    updateChecklist();
+  });
+
+  /* Drag & drop */
+  uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault(); uploadZone.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const dt = new DataTransfer(); dt.items.add(file);
+      imageInput.files = dt.files;
+      imageInput.dispatchEvent(new Event('change'));
+    }
+  });
+
+  /* ── Stock badge ── */
+  const stockInput = document.getElementById('stock');
+  const stockBadge = document.getElementById('stockBadge');
+
+  stockInput.addEventListener('input', function () {
+    const v = parseInt(this.value);
+    if (isNaN(v) || this.value === '') { stockBadge.style.display = 'none'; return; }
+    stockBadge.style.display = 'block';
+    if (v === 0)      { stockBadge.textContent = 'არ არის'; stockBadge.style.background = '#fdf2f2'; stockBadge.style.color = '#d94f4f'; }
+    else if (v <= 5)  { stockBadge.textContent = 'მცირე';   stockBadge.style.background = '#fff9ec'; stockBadge.style.color = '#c07c00'; }
+    else              { stockBadge.textContent = 'კარგი';   stockBadge.style.background = '#f0faf4'; stockBadge.style.color = '#4fad77'; }
+    updateChecklist();
+  });
+
+  /* ── Checklist ── */
+  const nameInput  = document.getElementById('name');
+  const descInput  = document.getElementById('description');
+  const priceInput = document.getElementById('price');
+
+  function updateChecklist() {
+    toggle('chk-name',  nameInput.value.trim().length > 1);
+    toggle('chk-desc',  descInput.value.trim().length > 10);
+    toggle('chk-price', priceInput.value > 0);
+    toggle('chk-stock', stockInput.value !== '' && parseInt(stockInput.value) >= 0);
+    toggle('chk-img',   imageInput.files.length > 0);
+  }
+
+  function toggle(id, done) {
+    document.getElementById(id).classList.toggle('done', done);
+  }
+
+  [nameInput, descInput, priceInput, stockInput].forEach(el => {
+    el.addEventListener('input', updateChecklist);
+  });
+</script>
+{% endblock %}

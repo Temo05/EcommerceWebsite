@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% block style %}
+ <style>
+    :root {
+      --bg:         #ffffff;
+      --bg2:        #f7f5f2;
+      --panel-bg:   #1c1c28;
+      --ink:        #1c1c28;
+      --ink2:       #3d3d52;
+      --muted:      #9090a8;
+      --sage:       #5b8c6e;
+      --sage2:      #7ab592;
+      --blush:      #e8856a;
+      --sky:        #5b8cb8;
+      --border:     #e8e5e0;
+      --border2:    #d4d0ca;
+      --field-bg:   #faf9f7;
+      --red:        #d94f4f;
+      --green:      #4fad77;
+      --shadow:     rgba(28,28,40,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); overflow-x: hidden; }
+
+    .auth-shell { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+    /* ── LEFT – decorative visual panel ── */
+    .panel-left {
+      position: relative;
+      background: var(--panel-bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden; padding: 3rem;
+    }
+
+    .blob { position: absolute; border-radius: 50%; filter: blur(80px); animation: blobMove 16s ease-in-out infinite alternate; pointer-events: none; }
+    .blob-1 { width: 400px; height: 400px; background: #5b8cb8; opacity: 0.22; top: -100px; right: -80px; animation-delay:0s; }
+    .blob-2 { width: 300px; height: 300px; background: #5b8c6e; opacity: 0.2;  bottom: -60px; left: -60px; animation-delay:-5s; }
+    .blob-3 { width: 220px; height: 220px; background: #e8856a; opacity: 0.18; top: 55%; right: 15%;    animation-delay:-10s; }
+    @keyframes blobMove {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(22px,16px) scale(1.07); }
+    }
+
+    .panel-left::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 30px 30px;
+      pointer-events: none; z-index: 1;
+    }
+
+    .panel-logo {
+      position: absolute; top: 3rem; left: 3rem; z-index: 2;
+      display: flex; align-items: center; gap: 0.7rem; text-decoration: none;
+    }
+    .logo-mark {
+      width: 38px; height: 38px;
+      background: var(--sage); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .logo-text { font-family: 'Fraunces', serif; font-size: 1.4rem; color: #fff; }
+
+    .panel-center { position: relative; z-index: 2; text-align: center; }
+
+    .display-word {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(7rem, 16vw, 14rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 0.9;
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(255,255,255,0.12);
+      user-select: none;
+      display: block;
+      margin-bottom: 2rem;
+      letter-spacing: -0.03em;
+    }
+
+    .welcome-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 1.2rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.06em;
+    }
+    .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage2); display: inline-block; }
+
+    /* ── RIGHT ── */
+    .panel-right {
+      display: flex; align-items: center; justify-content: center;
+      padding: 2.5rem 3.5rem;
+      background: var(--bg);
+      position: relative;
+    }
+    .panel-right::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--sage), var(--blush), var(--sky));
+    }
+
+    .form-shell {
+      width: 100%; max-width: 380px;
+      animation: fadeRight 0.5s ease both;
+    }
+    @keyframes fadeRight {
+      from { opacity: 0; transform: translateX(18px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .form-heading { margin-bottom: 1.8rem; }
+    .form-heading h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 2.2rem; font-weight: 400;
+      color: var(--ink); line-height: 1.15; margin-bottom: 0.4rem;
+    }
+    .form-heading h1 em { font-style: italic; color: var(--sage); }
+    .form-heading p { font-size: 0.84rem; color: var(--muted); }
+
+    .btn-google {
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      width: 100%; padding: 0.72rem 1rem;
+      background: var(--field-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--ink2); font-size: 0.87rem; font-weight: 500;
+      font-family: 'Outfit', sans-serif; text-decoration: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      margin-bottom: 1.4rem;
+    }
+    .btn-google:hover { border-color: var(--border2); background: #fff; box-shadow: 0 2px 12px var(--shadow); color: var(--ink); }
+    .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .or-divider {
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.4rem;
+      font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .field-group { margin-bottom: 1rem; }
+    .field-label {
+      display: block; font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink2); margin-bottom: 0.42rem;
+    }
+    .field-wrap { position: relative; }
+    .field-input {
+      width: 100%; padding: 0.75rem 1rem;
+      background: var(--field-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--ink); font-size: 0.9rem; font-family: 'Outfit', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .field-input::placeholder { color: var(--muted); font-size: 0.84rem; }
+    .field-input:focus { border-color: var(--sage); background: #fff; box-shadow: 0 0 0 3px rgba(91,140,110,0.12); }
+    .field-wrap .field-input { padding-right: 2.5rem; }
+
+    .pw-toggle {
+      position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: 4px; transition: color 0.2s; display: flex;
+    }
+    .pw-toggle:hover { color: var(--sage); }
+    .pw-toggle svg { width: 15px; height: 15px; }
+
+    .field-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 0.1rem 0 1.3rem;
+    }
+    .remember-label {
+      display: flex; align-items: center; gap: 0.45rem;
+      font-size: 0.82rem; color: var(--muted); cursor: pointer;
+    }
+    .remember-label input { accent-color: var(--sage); width: 14px; height: 14px; }
+    .forgot-link { font-size: 0.82rem; color: var(--sage); text-decoration: none; font-weight: 500; }
+    .forgot-link:hover { color: #4a7a5e; text-decoration: underline; }
+
+    .flash { padding: 0.7rem 1rem; border-radius: 8px; font-size: 0.82rem; margin-bottom: 1rem; }
+    .flash-error   { background: #fdf2f2; border: 1px solid #f5c2c2; color: var(--red); }
+    .flash-warning { background: #fffbf0; border: 1px solid #f0dfa0; color: #8a6d00; }
+    .flash-success { background: #f0faf4; border: 1px solid #b8e8cc; color: var(--green); }
+
+    .btn-submit {
+      width: 100%; padding: 0.8rem;
+      background: var(--sage); color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 0.92rem; font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer; letter-spacing: 0.02em;
+      transition: background 0.22s, transform 0.15s, box-shadow 0.22s;
+    }
+    .btn-submit:hover { background: #4a7a5e; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(91,140,110,0.28); }
+    .btn-submit:active { transform: translateY(0); }
+
+    .form-footer { text-align: center; margin-top: 1.3rem; font-size: 0.82rem; color: var(--muted); }
+    .form-footer a { color: var(--sage); font-weight: 500; text-decoration: none; }
+    .form-footer a:hover { color: #4a7a5e; text-decoration: underline; }
+
+    @media (max-width: 900px) {
+      .auth-shell { grid-template-columns: 1fr; }
+      .panel-left { display: none; }
+      .panel-right { padding: 2.5rem 1.5rem; min-height: 100vh; }
+    }
+  </style>
+  {% endblock %}
+{% block content %}
+<div class="auth-shell">
+
+  <!-- LEFT -->
+  <div class="panel-left">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <a href="/" class="panel-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      </div>
+      <span class="logo-text">შოპი</span>
+    </a>
+
+    <div class="panel-center">
+      <span class="display-word">შოპი</span>
+      <div class="welcome-badge">
+        <span class="badge-dot"></span>
+        კეთილი დაბრუნება
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="panel-right">
+    <div class="form-shell">
+
+      <div class="form-heading">
+        <h1>შედი<br/><em>ანგარიშზე</em></h1>
+        <p>გაგრძელება შენი ანგარიშით</p>
+      </div>
+
+      <a href="{{url_for('google.login')}}" class="btn-google">
+        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Google-ით შესვლა
+      </a>
+
+      <div class="or-divider">ან ელ-ფოსტით</div>
+
+      <form action="{{url_for('login')}}" method="post">
+          {{form.hidden_tag()}}
+          {% if error %}
+              <div class="flash flash-error">{{ error }}</div>
+          {% endif %}
+
+        <div class="field-group">
+          {{form.email.label(class="field-label")}}
+          {{form.email(class="field-input", id="email", placeholder="შენი@mail.com", autocomplete="email")}}
+        </div>
+
+        <div class="field-group">
+          {{form.password.label(class="field-label")}}
+          <div class="field-wrap">
+            {{form.password(class="field-input", id="password", placeholder="••••••••", autocomplete="current-password")}}
+            <button type="button" class="pw-toggle" onclick="togglePw('password',this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="field-meta">
+          <label class="remember-label">
+            <input type="checkbox" name="remember"/> დამიმახსოვრე
+          </label>
+          <a href="{{url_for('forgot_password')}}" class="forgot-link">პაროლი დაგავიწყდა?</a>
+        </div>
+
+        <button type="submit" class="btn-submit">შესვლა →</button>
+      </form>
+
+      <div class="form-footer">
+        ანგარიში არ გაქვს? <a href="/register">დარეგისტრირდი</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const eyeOpen  = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  const eyeClose = '<line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 01-4.24-4.24"/><path d="M6.53 6.53A10.94 10.94 0 001 12s4 8 11 8c2.54 0 4.9-.81 6.84-2.15"/>';
+  function togglePw(id, btn) {
+    const el = document.getElementById(id);
+    const show = el.type === 'password';
+    el.type = show ? 'text' : 'password';
+    btn.querySelector('svg').innerHTML = show ? eyeClose : eyeOpen;
+  }
+</script>
+{% endblock %}

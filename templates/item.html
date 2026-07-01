@@ -1,0 +1,610 @@
+{% extends 'base.html' %}
+{% block style %}
+ <style>
+    :root {
+      --bg:         #f7f5f2;
+      --white:      #ffffff;
+      --ink:        #1c1c28;
+      --ink2:       #3d3d52;
+      --muted:      #9090a8;
+      --sage:       #5b8c6e;
+      --sage2:      #7ab592;
+      --sage-light: #e8f3ed;
+      --blush:      #e8856a;
+      --sky:        #5b8cb8;
+      --border:     #e8e5e0;
+      --border2:    #d4d0ca;
+      --field-bg:   #faf9f7;
+      --red:        #d94f4f;
+      --shadow:     rgba(28,28,40,0.07);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      height: 64px;
+      display: flex; align-items: center;
+      padding: 0 2.5rem; gap: 2rem;
+    }
+    .navbar::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--sage), var(--blush), var(--sky));
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.65rem;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .logo-mark {
+      width: 36px; height: 36px; background: var(--sage); border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .logo-text { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--ink); }
+    .nav-spacer { flex: 1; }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-icon-btn {
+      width: 38px; height: 38px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      background: var(--field-bg);
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; color: var(--ink2);
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .nav-icon-btn:hover { border-color: var(--sage); background: var(--sage-light); color: var(--sage); }
+    .nav-icon-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-badge {
+      position: absolute; top: -5px; right: -5px;
+      width: 18px; height: 18px;
+      background: var(--blush); color: #fff;
+      border-radius: 50%; font-size: 0.62rem; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--white);
+    }
+    .nav-user {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 0.85rem;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      background: var(--field-bg);
+      text-decoration: none; font-size: 0.83rem; color: var(--ink2); font-weight: 500;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .nav-user:hover { border-color: var(--sage); background: var(--sage-light); color: var(--sage); }
+    .nav-user svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb-bar {
+      padding: 1rem 2.5rem;
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.8rem; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--white);
+    }
+    .breadcrumb-bar a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .breadcrumb-bar a:hover { color: var(--sage); }
+    .breadcrumb-bar svg { width: 12px; height: 12px; stroke: var(--border2); fill: none; stroke-width: 2; stroke-linecap: round; }
+    .breadcrumb-bar span { color: var(--ink2); font-weight: 500; }
+
+    /* ── PAGE ── */
+    .page-wrap { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+    /* ── PRODUCT SECTION ── */
+    .product-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 4rem;
+      align-items: start;
+    }
+
+    /* ── IMAGE SIDE ── */
+    .img-side { position: sticky; top: 80px; }
+
+    .main-img-wrap {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--white);
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .main-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .main-img-wrap:hover img { transform: scale(1.04); }
+
+    .img-badge {
+      position: absolute; top: 14px; left: 14px;
+      padding: 0.28rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.05em;
+      background: var(--sage-light); color: var(--sage);
+      border: 1px solid rgba(91,140,110,0.25);
+    }
+
+    .thumb-row {
+      display: flex; gap: 0.65rem;
+    }
+    .thumb {
+      width: 72px; height: 72px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .thumb:hover, .thumb.active { border-color: var(--sage); }
+
+    /* ── INFO SIDE ── */
+    .info-side { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .info-top { }
+    .info-category {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--sage); margin-bottom: 0.6rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .info-category::before {
+      content: '';
+      width: 20px; height: 1.5px;
+      background: var(--sage); display: inline-block;
+    }
+
+    .info-name {
+      font-family: 'Fraunces', serif;
+      font-size: 2rem; font-weight: 400;
+      color: var(--ink); line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .info-meta {
+      display: flex; align-items: center; gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .meta-chip {
+      display: flex; align-items: center; gap: 0.35rem;
+      font-size: 0.78rem; color: var(--muted);
+    }
+    .meta-chip svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .stock-indicator {
+      display: flex; align-items: center; gap: 0.35rem;
+      font-size: 0.78rem; font-weight: 500;
+    }
+    .stock-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .in-stock  .stock-dot { background: var(--sage2); }
+    .in-stock  { color: var(--sage); }
+    .low-stock .stock-dot { background: #c07c00; }
+    .low-stock { color: #c07c00; }
+    .no-stock  .stock-dot { background: var(--red); }
+    .no-stock  { color: var(--red); }
+
+    /* Price card */
+    .price-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.4rem;
+    }
+    .price-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+    .price-main {
+      font-family: 'Fraunces', serif;
+      font-size: 2.6rem; font-weight: 400;
+      color: var(--ink); line-height: 1;
+      margin-bottom: 1.2rem;
+    }
+    .price-main span { font-size: 1.3rem; color: var(--muted); font-family: 'Outfit', sans-serif; vertical-align: super; font-size: 1rem; margin-right: 2px; }
+
+    /* Quantity */
+    .qty-row {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    .qty-label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink2); white-space: nowrap; }
+    .qty-control {
+      display: flex; align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--field-bg);
+    }
+    .qty-btn {
+      width: 40px; height: 40px;
+      background: none; border: none;
+      font-size: 1.2rem; color: var(--ink2);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s;
+      font-family: 'Outfit', sans-serif;
+    }
+    .qty-btn:hover { background: var(--sage-light); color: var(--sage); }
+    .qty-btn:disabled { color: var(--border2); cursor: not-allowed; }
+    .qty-num {
+      width: 52px; text-align: center;
+      font-size: 1rem; font-weight: 600;
+      color: var(--ink); font-family: 'Outfit', sans-serif;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      padding: 0.5rem 0;
+    }
+
+    /* Total */
+    .total-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.8rem 1rem;
+      background: var(--field-bg);
+      border-radius: 10px;
+      margin-bottom: 1.2rem;
+      border: 1px solid var(--border);
+    }
+    .total-label { font-size: 0.82rem; color: var(--muted); }
+    .total-price {
+      font-family: 'Fraunces', serif;
+      font-size: 1.6rem; font-weight: 400;
+      color: var(--sage);
+    }
+    .total-price small { font-size: 0.85rem; font-family: 'Outfit', sans-serif; color: var(--muted); margin-right: 2px; }
+
+    /* Buttons */
+    .btn-cart {
+      width: 100%; padding: 0.88rem;
+      background: var(--sage); color: #fff;
+      border: none; border-radius: 11px;
+      font-size: 0.95rem; font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer; letter-spacing: 0.02em;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      transition: background 0.22s, transform 0.15s, box-shadow 0.22s;
+      margin-bottom: 0.65rem;
+    }
+    .btn-cart svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-cart:hover { background: #4a7a5e; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(91,140,110,0.28); }
+    .btn-cart:active { transform: translateY(0); }
+
+    .btn-wishlist {
+      width: 100%; padding: 0.82rem;
+      background: transparent; color: var(--ink2);
+      border: 1.5px solid var(--border); border-radius: 11px;
+      font-size: 0.88rem; font-weight: 500;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .btn-wishlist svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-wishlist:hover { border-color: var(--blush); color: var(--blush); background: #fdf2ef; }
+
+    /* Description card */
+    .desc-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.4rem;
+    }
+    .desc-card h3 {
+      font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink2); margin-bottom: 0.8rem;
+    }
+    .desc-card p {
+      font-size: 0.88rem; color: var(--ink2);
+      line-height: 1.75;
+    }
+
+    /* Guarantees */
+    .guarantees {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+    .guarantee-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.75rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.78rem; color: var(--ink2);
+    }
+    .guarantee-item svg { width: 16px; height: 16px; stroke: var(--sage); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+    .section-divider h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem; font-weight: 400;
+      color: var(--ink); white-space: nowrap;
+    }
+    .section-divider h2 em { font-style: italic; color: var(--sage); }
+    .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── RELATED GRID ── */
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+    }
+
+    .related-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column;
+      transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s;
+    }
+    .related-card:hover {
+      box-shadow: 0 6px 24px var(--shadow);
+      transform: translateY(-3px);
+      border-color: var(--border2);
+      color: inherit;
+    }
+    .related-img {
+      width: 100%; aspect-ratio: 1;
+      overflow: hidden; background: var(--field-bg);
+    }
+    .related-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.35s;
+    }
+    .related-card:hover .related-img img { transform: scale(1.06); }
+
+    .related-body { padding: 0.8rem; flex: 1; display: flex; flex-direction: column; }
+    .related-name {
+      font-size: 0.8rem; font-weight: 500; color: var(--ink);
+      line-height: 1.4; margin-bottom: 0.5rem;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .related-price {
+      font-family: 'Fraunces', serif;
+      font-size: 1.05rem; font-weight: 400; color: var(--ink);
+      margin-top: auto;
+    }
+    .related-price small { font-size: 0.7rem; color: var(--muted); font-family: 'Outfit', sans-serif; }
+
+    /* Toast */
+    .toast-wrap {
+      position: fixed; bottom: 2rem; right: 2rem;
+      z-index: 999;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .toast {
+      background: var(--ink);
+      color: #fff;
+      padding: 0.8rem 1.2rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      display: flex; align-items: center; gap: 0.6rem;
+      box-shadow: 0 8px 24px rgba(28,28,40,0.2);
+      animation: toastIn 0.35s ease both;
+      max-width: 280px;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .toast svg { width: 16px; height: 16px; stroke: var(--sage2); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+    @media (max-width: 900px) {
+      .product-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .img-side { position: static; }
+      .related-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .navbar { padding: 0 1rem; }
+      .breadcrumb-bar { padding: 0.8rem 1rem; }
+      .page-wrap { padding: 1.5rem 1rem 3rem; }
+      .related-grid { grid-template-columns: repeat(2, 1fr); }
+      .guarantees { grid-template-columns: 1fr; }
+      .info-name { font-size: 1.6rem; }
+    }
+  </style>
+    {% endblock %}
+{% block content %}
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="/" class="nav-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    </div>
+    <span class="logo-text">შოპი</span>
+  </a>
+  <div class="nav-spacer"></div>
+  <div class="nav-actions">
+    {% if current_user.is_authenticated %}
+      <a href="/cart" class="nav-icon-btn">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="nav-badge">{{cart_items_count}}</span>
+      </a>
+      <a href="/profile" class="nav-user">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        {{current_user.username.split(" ") | first}}
+      </a>
+    {% else %}
+      <a href="/register" class="nav-user">დარეგისტრირდი</a>
+      <a href="/login" class="nav-user">შესვლა</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+  <a href="/">მთავარი</a>
+  <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  <a href="/?category={{product.type}}">{{product.type}}</a>
+  <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  <span>{{product.name}}</span>
+</div>
+
+<!-- MAIN -->
+<div class="page-wrap">
+
+  <!-- Product -->
+  <div class="product-layout">
+
+    <!-- LEFT — images -->
+    <div class="img-side">
+      <div class="main-img-wrap">
+        <img id="mainImg" src="{{product.image_filename}}" alt="Sony WH-1000XM5"/>
+        <span class="img-badge">ახალი</span>
+      </div>
+      <div class="thumb-row">
+        <div class="thumb active" onclick="changeImg(this, '{{product.image_filename}}')">
+          <img src="{{product.image_filename}}" alt=""/>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — info -->
+    <div class="info-side">
+
+      <div class="info-top">
+        <div class="info-category">{{product.type}}</div>
+        <h1 class="info-name">{{product.name}}</h1>
+        <div class="info-meta">
+          <div class="stock-indicator in-stock">
+            <span class="stock-dot"></span> {% if product.stock > 0 %}მარაგშია{% else %}არ არის მარაგში{% endif %} ({{product.stock}} ც.)
+          </div>
+          <div class="meta-chip">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            მიტანა 1-3 დღეში
+          </div>
+        </div>
+      </div>
+
+      <!-- Price + cart -->
+      <div class="price-card">
+        <div class="price-label">ფასი</div>
+        <div class="price-main"><span>₾</span><span id="unitPrice">{{'%.2f' | format(product.price) }}</span></div>
+
+        <div class="qty-row">
+          <span class="qty-label">რაოდენობა</span>
+          <div class="qty-control">
+            <button class="qty-btn" id="qtyMinus" onclick="changeQty(-1)" disabled>−</button>
+            <div class="qty-num" id="qtyDisplay">1</div>
+            <button class="qty-btn" id="qtyPlus" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+
+        <div class="total-row">
+          <span class="total-label">სულ გადასახდელი</span>
+          <div class="total-price"><small>₾</small><span id="totalPrice">{{'%.2f' | format(product.price) }}</span></div>
+        </div>
+
+        <form method="POST" action="/cart/add/{{product.id}}" id="cartForm">
+          <input type="hidden" name="item_id" value="1"/>
+          <input type="hidden" name="quantity" id="qtyInput" value="1"/>
+          <button type="submit" class="btn-cart" onclick="handleCart(event)">
+            <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            კალათაში დამატება
+          </button>
+        </form>
+      </div>
+
+      <!-- Description -->
+      <div class="desc-card">
+        <h3>პროდუქტის შესახებ</h3>
+        <p>{{product.description}}</p>
+      </div>
+
+      <!-- Guarantees -->
+      <div class="guarantees">
+        <div class="guarantee-item">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          2 წლიანი გარანტია
+        </div>
+        <div class="guarantee-item">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          უფასო მიტანა
+        </div>
+        <div class="guarantee-item">
+          <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
+          30 დღე დაბრუნება
+        </div>
+        <div class="guarantee-item">
+          <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          უსაფრთხო გადახდა
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Related items -->
+  <div class="section-divider">
+    <h2>მსგავსი <em>პროდუქტები</em></h2>
+  </div>
+
+  <div class="related-grid">
+
+      {% for related_product in related_items %}
+        <a href="/item/{{related_product.id}}" class="related-card">
+          <div class="related-img">
+            <img src="{{related_product.image_filename}}" alt="AirPods Pro"/>
+          </div>
+          <div class="related-body">
+            <div class="related-name">{{related_product.name}}</div>
+            <div class="related-price"><small>₾</small>{{'%.2f' | format(related_product.price)}}</div>
+          </div>
+        </a>
+      {% endfor %}
+  </div>
+
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+  const UNIT_PRICE = {{product.price}};
+  const MAX_STOCK  = {{product.stock}};
+  let qty = 1;
+
+  function changeQty(delta) {
+    qty = Math.max(1, Math.min(MAX_STOCK, qty + delta));
+    document.getElementById('qtyDisplay').textContent = qty;
+    document.getElementById('qtyInput').value = qty;
+    document.getElementById('totalPrice').textContent = (UNIT_PRICE * qty).toFixed(2);
+    document.getElementById('qtyMinus').disabled = qty <= 1;
+    document.getElementById('qtyPlus').disabled  = qty >= MAX_STOCK;
+  }
+
+  /* Image switcher */
+  function changeImg(thumb, url) {
+    document.getElementById('mainImg').src = url;
+    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+  }
+
+  /* Cart handler — shows toast, real form submits normally */
+  function handleCart(e) {
+    showToast('კალათაში დაემატა ✓');
+    const badge = document.getElementById('cartCount');
+    badge.textContent = parseInt(badge.textContent) + qty;
+  }
+
+  function showToast(msg) {
+    const wrap = document.getElementById('toastWrap');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${msg}`;
+    wrap.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+</script>
+{% endblock %}
